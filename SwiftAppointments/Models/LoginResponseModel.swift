@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct LoginResponseModel{
+struct LoginResponseModel: Codable{
     var id:Int
     var token:String
     var timeToLive:Int

@@ -16,11 +16,32 @@ class ResponseHandler{
         return ResultModel(result: true, message: "");
     }
     
-    private func processResponse(response: URLResponse?) -> Int?{
+    private func processResponse(response: URLResponse?) -> ResponseStatusModel{
         guard let httpResponse = response as? HTTPURLResponse else {
-            return nil
+            return ResponseStatusModel(statusCode:-1, message: "Invalid response \(response)", result: false)
         }
-        return httpResponse.statusCode
+        var responseStatusModel = ResponseStatusModel(statusCode: 200, message: "", result: true)
+        switch httpResponse.statusCode {
+        case 200,201:
+            break
+        case 401:
+            responseStatusModel.statusCode = 401
+            responseStatusModel.result = false
+            responseStatusModel.message = "Unauthorized"
+            break
+        case 403:
+            responseStatusModel.statusCode = 403
+            responseStatusModel.result = false
+            responseStatusModel.message = "Forbidden"
+            break
+        case 404:
+            responseStatusModel.statusCode = 404
+            responseStatusModel.result = false
+            responseStatusModel.message = "Not found"
+            break
+        default: break
+        }
+        return responseStatusModel
     }
     
     func processLoginResponse(response: URLResponse?, error: Error?) -> ResultModel{
@@ -31,31 +52,12 @@ class ResponseHandler{
             return errorResultModel
         }        
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                resultModel.message = "Not found"
-                break
-            default: break
-            }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
-        }
         
-        return resultModel
+        var responseStatusModel = processResponse(response: response)
+        if(!responseStatusModel.result && responseStatusModel.statusCode == 401){
+            responseStatusModel.message = "Invalid username or password"
+        }
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processCreateAccountResponse(data: Data?, response: URLResponse?, error: Error?) -> ResultModel{
@@ -66,48 +68,17 @@ class ResponseHandler{
             return errorResultModel
         }
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200, 201:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Unauthorized"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                resultModel.message = "Not Found"                
-                break
-            case 409:
-                resultModel.result = false
-//                do{
-//                    var responseJson = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-//                    if let rJson = responseJson {
-//                        resultModel.message = rJson["message"] as? String ?? ""
-//                    }
-//                }catch let error{
-//                    resultModel.message = "Username conflict"
-//                }
-                var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                if let rJson = responseJson {
-                    resultModel.message = (rJson!["message"] as? String)!
-                }else{
-                    resultModel.message = "Username conflict"
-                }
-                break
-            default: break
+        var responseStatusModel = processResponse(response: response)
+        if(responseStatusModel.statusCode == 409){
+            let responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
+            if let rJson = responseJson {
+                responseStatusModel.message = (rJson!["message"] as? String)!
+            }else{
+                responseStatusModel.message = "Username conflict"
             }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
         }
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processForgotPasswordResponse(response: URLResponse?, error: Error?) -> ResultModel{
@@ -118,31 +89,9 @@ class ResponseHandler{
             return errorResultModel
         }
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                resultModel.message = "Not found"
-                break
-            default: break
-            }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
-        }
+        let responseStatusModel = processResponse(response: response)
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processUserDetailsResponse(data:Data?, response: URLResponse?, error: Error?) -> ResultModel {
@@ -152,37 +101,19 @@ class ResponseHandler{
         {
             return errorResultModel
         }
+        
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                if let rJson = responseJson {
-                    resultModel.message = (rJson!["message"] as? String)!
-                }else{
-                    resultModel.message = "No data found for the user"
-                }
-                break
-            default: break
+        var responseStatusModel = processResponse(response: response)
+        if(responseStatusModel.statusCode == 404){
+            var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
+            if let rJson = responseJson {
+                responseStatusModel.message = (rJson!["message"] as? String)!
+            }else{
+                responseStatusModel.message = "No data found for the user"
             }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
         }
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processUpdateUserDetailsResponse(data:Data?, response: URLResponse?, error: Error?) -> ResultModel {
@@ -193,36 +124,17 @@ class ResponseHandler{
             return errorResultModel
         }
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                if let rJson = responseJson {
-                    resultModel.message = (rJson!["message"] as? String)!
-                }else{
-                    resultModel.message = "No data found for the user"
-                }
-                break
-            default: break
+        var responseStatusModel = processResponse(response: response)
+        if(responseStatusModel.statusCode == 404){
+            var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
+            if let rJson = responseJson {
+                responseStatusModel.message = (rJson!["message"] as? String)!
+            }else{
+                responseStatusModel.message = "No data found for the user"
             }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
         }
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processUserHospitalsResponse(data:Data?, response: URLResponse?, error: Error?) -> ResultModel {
@@ -233,36 +145,17 @@ class ResponseHandler{
             return errorResultModel
         }
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                if let rJson = responseJson {
-                    resultModel.message = (rJson!["message"] as? String)!
-                }else{
-                    resultModel.message = "No data found for the user"
-                }
-                break
-            default: break
+        var responseStatusModel = processResponse(response: response)
+        if(responseStatusModel.statusCode == 404){
+            var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
+            if let rJson = responseJson {
+                responseStatusModel.message = (rJson!["message"] as? String)!
+            }else{
+                responseStatusModel.message = "No data found for the user"
             }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
         }
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
     
     func processPostUserHospitalResponse(data:Data?, response: URLResponse?, error: Error?) -> ResultModel {
@@ -273,35 +166,16 @@ class ResponseHandler{
             return errorResultModel
         }
         //Now process response
-        var resultModel = ResultModel(result: true, message: "")
-        if let statusCode = processResponse(response: response){
-            switch statusCode{
-            case 200:
-                break
-            case 401:
-                resultModel.result = false
-                resultModel.message = "Invalid username or password"
-                break
-            case 403:
-                resultModel.result = false
-                resultModel.message = "Forbidden"
-                break
-            case 404:
-                resultModel.result = false
-                var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                if let rJson = responseJson {
-                    resultModel.message = (rJson!["message"] as? String)!
-                }else{
-                    resultModel.message = "No data found for the user"
-                }
-                break
-            default: break
+        var responseStatusModel = processResponse(response: response)
+        if(responseStatusModel.statusCode == 404){
+            var responseJson = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
+            if let rJson = responseJson {
+                responseStatusModel.message = (rJson!["message"] as? String)!
+            }else{
+                responseStatusModel.message = "No data found for the user"
             }
-        } else{
-            resultModel.result = false
-            resultModel.message = "Invalid response \(response)"
         }
         
-        return resultModel
+        return ResultModel(result:responseStatusModel.result, message: responseStatusModel.message)
     }
 }

@@ -21,16 +21,10 @@ class JSONHandler{
     }
     
     func getLoginResponseModel(data: Data) -> LoginResponseModel?{
-        var responseJSON: [String: Any]?
         do{
-            responseJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            guard let rJson = responseJSON,
-                  let id = rJson["id"] as? Int,
-                  let token = rJson["token"] as? String,
-                  let timeToLive = rJson["timeToLive"] as? Int else {
-                return nil;
-            }
-            return LoginResponseModel(id: id, token: token, timeToLive: timeToLive)
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(LoginResponseModel.self, from: data)
+            return response
         } catch let _ {
             return nil
         }
@@ -49,20 +43,10 @@ class JSONHandler{
     }
     
     func getUserDetailsResponseModel(data: Data) -> UserDetailsModel? {
-        var responseJSON: [String: Any]?
         do{
-            responseJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            guard let rJson = responseJSON,
-                //let rJson = rJsonArr.first,
-                let id = rJson["id"] as? Int,
-                let username = rJson["username"] as? String,
-                let email = rJson["email"] as? String,
-                let firstname = rJson["firstName"] as? String,
-                let lastname = rJson["lastName"] as? String,
-                let dob = rJson["dateOfBirth"] as? String else {
-                    return nil;
-            }
-            return UserDetailsModel(id: id, username: username, email: email, firstname: firstname, lastname: lastname, dob: dob)
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(UserDetailsModel.self, from: data)
+            return response
         } catch let error{
             return nil
         }
@@ -82,59 +66,24 @@ class JSONHandler{
     
     func getUserHospitalsResponseModel(data: Data) -> [HospitalAppointmentModel]? {
         var hospitalsModel = [HospitalAppointmentModel]()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy"
-        
-        var responseJSON: [Any]?
         do{
-            responseJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [Any]
-            guard let responseJSONWrapped = responseJSON, responseJSONWrapped.count != 0 else {
-                return hospitalsModel
-            }
+            let decoder = JSONDecoder()
+            let hospitalAppointmentResponse = try decoder.decode([HospitalAppointmentResponse].self, from: data)
             
-            for respJSON in responseJSONWrapped {
-                let respJsonDict = respJSON as! [String:Any]
-                let hospitalId = respJsonDict["hospitalId"] as! Int
-                let hospitalName = respJsonDict["hospitalName"] as! String
-                let appointments = respJsonDict["appointments"] as! [Any]
-                
-                for appointment in appointments {
-                    let appointmentDict = appointment as! [String:Any]
-                    let appointmentId = appointmentDict["id"] as! Int
-                    let dateOfAppointment = appointmentDict["dateOfAppointment"] as! String
-                    let timeOfAppointment = appointmentDict["timeOfAppointment"] as! String
-                    //Finding day of appointment - need a better way of doing this for different locale
-                    var dayOfAppointment = ""
-                    if let date = dateFormatter.date(from: dateOfAppointment) {
-                        switch Calendar.current.component(.weekday, from: date) {
-                        case 1:
-                            dayOfAppointment = "Sun"
-                            break
-                        case 2:
-                            dayOfAppointment = "Mon"
-                            break
-                        case 3:
-                            dayOfAppointment = "Tue"
-                            break
-                        case 4:
-                            dayOfAppointment = "Wed"
-                            break
-                        case 5:
-                            dayOfAppointment = "Thu"
-                            break
-                        case 6:
-                            dayOfAppointment = "Fri"
-                            break
-                        case 7:
-                            dayOfAppointment = "Sat"
-                            break
-                        default: break
-                        }
-                    }
-                    let hospitalAppointmentModel = HospitalAppointmentModel(appointmentId: appointmentId, dateOfAppointment: dateOfAppointment, timeOfAppointment: timeOfAppointment, dayOfAppointment: dayOfAppointment, hospitalId: hospitalId, hospitalName: hospitalName)
+            for hospitalAppointment in hospitalAppointmentResponse {
+                for appointmentModel in hospitalAppointment.appointments{
+                    var hospitalAppointmentModel = HospitalAppointmentModel(
+                        appointmentId: appointmentModel.id,
+                        dateOfAppointment: appointmentModel.dateOfAppointment,
+                        timeOfAppointment:appointmentModel.timeOfAppointment,
+                        dayOfAppointment:"",
+                        hospitalId : hospitalAppointment.hospitalId,
+                        hospitalName: hospitalAppointment.hospitalName
+                    )
+                    hospitalAppointmentModel.dayOfAppointment = getDayFromDate(dateOfAppointment: hospitalAppointmentModel.dateOfAppointment)
                     
                     hospitalsModel.append(hospitalAppointmentModel)
-                }                
+                }
             }
             
             return hospitalsModel
@@ -153,5 +102,39 @@ class JSONHandler{
             print(error)
             return nil
         }
+    }
+        
+    func getDayFromDate(dateOfAppointment: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        var dayOfAppointment = ""
+        if let date = dateFormatter.date(from: dateOfAppointment) {
+            switch Calendar.current.component(.weekday, from: date) {
+            case 1:
+                dayOfAppointment = "Sun"
+                break
+            case 2:
+                dayOfAppointment = "Mon"
+                break
+            case 3:
+                dayOfAppointment = "Tue"
+                break
+            case 4:
+                dayOfAppointment = "Wed"
+                break
+            case 5:
+                dayOfAppointment = "Thu"
+                break
+            case 6:
+                dayOfAppointment = "Fri"
+                break
+            case 7:
+                dayOfAppointment = "Sat"
+                break
+            default: break
+            }
+        }
+        
+        return dayOfAppointment
     }
 }

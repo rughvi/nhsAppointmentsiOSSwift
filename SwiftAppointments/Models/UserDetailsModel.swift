@@ -7,11 +7,20 @@
 //
 
 import Foundation
-struct UserDetailsModel {
+struct UserDetailsModel: Codable {
     var id: Int
     var username: String
     var email: String
     var firstname: String
     var lastname: String
     var dob: String
+    
+    enum CodingKeys: String, CodingKey{
+        case id = "id"
+        case username = "username"
+        case email = "email"
+        case firstname = "firstName"
+        case lastname = "lastName"
+        case dob="dateOfBirth"
+    }
 }

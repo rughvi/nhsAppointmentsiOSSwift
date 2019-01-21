@@ -7,8 +7,7 @@
 //
 
 import Foundation
-struct HospitalAppointmentModel {
-    
+struct HospitalAppointmentModel {    
     var appointmentId: Int
     var dateOfAppointment: String
     var timeOfAppointment: String

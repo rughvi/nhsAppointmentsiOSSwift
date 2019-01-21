@@ -19,6 +19,9 @@
 		651E356721D9313A00EAE80C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 651E356621D9313A00EAE80C /* Assets.xcassets */; };
 		651E356A21D9313A00EAE80C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 651E356821D9313A00EAE80C /* LaunchScreen.storyboard */; };
 		651E357521D93FC700EAE80C /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651E357421D93FC700EAE80C /* LoginViewController.swift */; };
+		653CCF1A21F5C9B00066744E /* AppointmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653CCF1921F5C9B00066744E /* AppointmentModel.swift */; };
+		653CCF1C21F5CA340066744E /* HospitalAppointmentResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653CCF1B21F5CA340066744E /* HospitalAppointmentResponse.swift */; };
+		653CCF1E21F5E24E0066744E /* ResponseStatusModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653CCF1D21F5E24E0066744E /* ResponseStatusModel.swift */; };
 		65609BF921E7666E00A9E489 /* PrinterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65609BF821E7666E00A9E489 /* PrinterController.swift */; };
 		65609BFB21E7686F00A9E489 /* CustomError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65609BFA21E7686F00A9E489 /* CustomError.swift */; };
 		65609BFD21E77B7F00A9E489 /* AddHospitalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65609BFC21E77B7F00A9E489 /* AddHospitalViewController.swift */; };
@@ -60,6 +63,9 @@
 		651E356921D9313A00EAE80C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		651E356B21D9313A00EAE80C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		651E357421D93FC700EAE80C /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		653CCF1921F5C9B00066744E /* AppointmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppointmentModel.swift; sourceTree = "<group>"; };
+		653CCF1B21F5CA340066744E /* HospitalAppointmentResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HospitalAppointmentResponse.swift; sourceTree = "<group>"; };
+		653CCF1D21F5E24E0066744E /* ResponseStatusModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseStatusModel.swift; sourceTree = "<group>"; };
 		65609BF821E7666E00A9E489 /* PrinterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterController.swift; sourceTree = "<group>"; };
 		65609BFA21E7686F00A9E489 /* CustomError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomError.swift; sourceTree = "<group>"; };
 		65609BFC21E77B7F00A9E489 /* AddHospitalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHospitalViewController.swift; sourceTree = "<group>"; };
@@ -189,6 +195,9 @@
 				65FF140121DCB265004A3FC8 /* UserDetailsModel.swift */,
 				65FF140E21DD0C53004A3FC8 /* HospitalAppointmentModel.swift */,
 				65609BFA21E7686F00A9E489 /* CustomError.swift */,
+				653CCF1921F5C9B00066744E /* AppointmentModel.swift */,
+				653CCF1B21F5CA340066744E /* HospitalAppointmentResponse.swift */,
+				653CCF1D21F5E24E0066744E /* ResponseStatusModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -365,6 +374,7 @@
 				6512FC6321DA4FF800946FE8 /* CreateAccountViewController.swift in Sources */,
 				659CEE6821D9584800F80869 /* DIApp.swift in Sources */,
 				65FF140221DCB265004A3FC8 /* UserDetailsModel.swift in Sources */,
+				653CCF1A21F5C9B00066744E /* AppointmentModel.swift in Sources */,
 				6512FC5821DA17F100946FE8 /* ResponseHandler.swift in Sources */,
 				65609BFD21E77B7F00A9E489 /* AddHospitalViewController.swift in Sources */,
 				65FF140921DCFD9C004A3FC8 /* HospitalsService.swift in Sources */,
@@ -375,6 +385,8 @@
 				6512FC5E21DA338700946FE8 /* JSONHandler.swift in Sources */,
 				6590CF4921E7411E0046F955 /* DocumentViewController.swift in Sources */,
 				65A913CE21DC27C30053CB28 /* SettingsService.swift in Sources */,
+				653CCF1C21F5CA340066744E /* HospitalAppointmentResponse.swift in Sources */,
+				653CCF1E21F5E24E0066744E /* ResponseStatusModel.swift in Sources */,
 				659CEE7221D978DC00F80869 /* Endpoints.swift in Sources */,
 				6512FC5C21DA303F00946FE8 /* RequestHandler.swift in Sources */,
 				65A913C821DBE5870053CB28 /* ForgotPasswordViewController.swift in Sources */,
